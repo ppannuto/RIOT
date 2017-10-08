@@ -62,25 +62,35 @@ extern "C" {
  * @{
  */
 
-#define CLOCK_USE_PLL       (1)
+
+// 17.1, p224
+// The RTC is typically clocked by the 1.024kHz output from the 32.768kHz
+// High-Accuracy Internal Crystal Oscillator(OSC32K) and this is the
+// configuration optimized for the lowest power consumption.
+#define CLOCK_USE_PLL           (0)
+#define CLOCK_USE_XOSC32_DFLL   (0)
+#define CLOCK_USE_OSCULP32_DFLL (1) // 32kHz ultra-low-power internal oscillator (OSCULP32K)
 
 #if CLOCK_USE_PLL
-/* edit these values to adjust the PLL output frequency */
-#define CLOCK_PLL_MUL       (47U)               /* must be >= 31 & <= 95 */
-#define CLOCK_PLL_DIV       (1U)                /* adjust to your needs */
-/* generate the actual used core clock frequency */
-#define CLOCK_CORECLOCK     (((CLOCK_PLL_MUL + 1) * 1000000U) / CLOCK_PLL_DIV)
+ /* edit these values to adjust the PLL output frequency */
+ #define CLOCK_PLL_MUL       (47U)               /* must be >= 31 & <= 95 */
+ #define CLOCK_PLL_DIV       (1U)                /* adjust to your needs */
+ /* generate the actual used core clock frequency */
+ #define CLOCK_CORECLOCK     (((CLOCK_PLL_MUL + 1) * 1000000U) / CLOCK_PLL_DIV)
 #elif CLOCK_USE_XOSC32_DFLL
-    /* Settings for 32 kHz external oscillator and 48 MHz DFLL */
-#define CLOCK_CORECLOCK     (48000000U)
-#define CLOCK_XOSC32K       (32768UL)
-#define CLOCK_8MHZ          (1)
-#define GEN2_ULP32K         (1)
+     /* Settings for 32 kHz external oscillator and 48 MHz DFLL */
+ #define CLOCK_CORECLOCK     (48000000U)
+ #define CLOCK_XOSC32K       (32768UL)
+ #define CLOCK_8MHZ          (1)
+ #define GEN2_ULP32K         (1)
+ #define CLOCK_DIV           (1U)
+#elif CLOCK_USE_OSCULP32_DFLL
+ #define CLOCK_CORECLOCK     (32768U)
+ #define CLOCK_8MHZ          (0) /* 8MHz high-accuracy internal oscillator (OSC8M) */
+ #define GEN2_ULP32K         (1)
+ #define CLOCK_DIV           (1U)
 #else
-/* edit this value to your needs */
-#define CLOCK_DIV           (1U)
-/* generate the actual core clock frequency */
-#define CLOCK_CORECLOCK     (8000000 / CLOCK_DIV)
+#error Configure a clock!
 #endif
 /** @} */
 
