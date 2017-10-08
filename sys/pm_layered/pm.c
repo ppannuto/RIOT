@@ -33,6 +33,14 @@
 #define PM_BLOCKER_INITIAL { .val_u32 = 0 }
 #endif
 
+/*
+#define VALUE_TO_STRING(x) #x
+#define VALUE(x) VALUE_TO_STRING(x)
+#define VAR_NAME_VALUE(var) #var "="  VALUE(var)
+#pragma message(VAR_NAME_VALUE(PM_BLOCKER_INITIAL))
+#error PM_BLOCKER_INITIAL
+*/
+
 /**
  * @brief Power Management mode typedef
  */
