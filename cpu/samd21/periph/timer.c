@@ -45,9 +45,10 @@ static inline void _irq_enable(tim_t dev);
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     /* at the moment, the timer can only run at 1MHz */
-    if (freq != 1000000ul) {
-        return -1;
-    }
+    //if (freq != 1000000ul) {
+    //    return -1;
+    //}
+    // Well, that comment seems to just be a lie -Pat
 
 /* select the clock generator depending on the main clock source:
  * GCLK0 (1MHz) if we use the internal 8MHz oscillator
@@ -59,6 +60,17 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     while (GCLK->STATUS.bit.SYNCBUSY) {}
     /* TC4 and TC5 share the same channel */
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+#elif CLOCK_USE_OSCULP32_DFLL
+    // 13.8.3 p101
+    // Each register write
+    //   Chooses to enable the generic clock in quesiton
+    //   Selects a generic clock
+    //   Ties a peripheral to the selectec generic clock
+    GCLK->CLKCTRL.reg = (uint16_t)(GCLK_CLKCTRL_CLKEN
+                                 | GCLK_CLKCTRL_GEN_GCLK0
+                                 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)
+            );
+    while (GCLK->STATUS.bit.SYNCBUSY) {}
 #else
     /* configure GCLK0 to feed TC3, TC4 and TC5 */;
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
